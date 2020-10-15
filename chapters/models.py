@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from Section.models import Section
+from sections.models import Section
 
 class Chapter(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
