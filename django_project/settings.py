@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'chapters',
     'sections',
     'activity',
+    'question',
 ]
 
 MIDDLEWARE = [
