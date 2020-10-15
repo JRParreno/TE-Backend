@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'chapters',
     'sections',
+    'activity',
 ]
 
 MIDDLEWARE = [
