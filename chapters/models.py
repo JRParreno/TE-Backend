@@ -17,6 +17,10 @@ class Chapter(models.Model):
 
 # student per chapter
 class StudentChapter(models.Model):
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE) # get specific chapter
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.BooleanField(default=False, null=False, blank=False)
     feedback = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.chapter.title
