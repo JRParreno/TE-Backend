@@ -19,12 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, min_length=4),
     first_name = serializers.CharField(max_length=255, min_length=2)
     last_name = serializers.CharField(max_length=255, min_length=2)
-    prof = ProfessorSerializer()
+    professor = serializers.CharField(source='professor.faculty_id')
 
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'prof']
+                  'email', 'password', 'professor']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -34,9 +34,10 @@ class UserSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        prof = validated_data.pop('prof')
+        professor_data = validated_data.pop('professor')
         user = User.objects.create_user(**validated_data)
-        Professor.objects.create(user=user, **prof)
+        user.save()
+        Professor.objects.create(user=user, **professor_data)
         return user
 
 
