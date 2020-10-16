@@ -10,9 +10,9 @@ from rest_framework import status
 from django.conf import settings
 from django.contrib import auth
 import jwt
-# Create your views here.
 
 
+# Register for Professor
 class RegisterView(GenericAPIView):
     serializer_class = UserSerializer
 
