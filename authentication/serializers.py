@@ -4,27 +4,19 @@ from django.contrib.auth.models import User
 from users.models import Professor
 
 
-class ProfessorSerializer(serializers.ModelSerializer):
-
-    faculty_id = serializers.CharField(max_length=255, min_length=2)
-
-    class Meta:
-        model = Professor
-        fields = ['faculty_id']
-
-
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=65, min_length=8, write_only=True)
     email = serializers.EmailField(max_length=255, min_length=4),
     first_name = serializers.CharField(max_length=255, min_length=2)
     last_name = serializers.CharField(max_length=255, min_length=2)
-    prof = ProfessorSerializer()
+    faculty_id = serializers.CharField(source='professor.faculty_id')
+    middile_name = serializers.CharField(source='professor.middle_name')
 
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'prof']
+                  'email', 'password', 'middile_name', 'faculty_id']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -34,9 +26,10 @@ class UserSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        prof = validated_data.pop('prof')
+        professor_data = validated_data.pop('professor')
         user = User.objects.create_user(**validated_data)
-        Professor.objects.create(user=user, **prof)
+        Professor.objects.create(user=user, **professor_data)
+
         return user
 
 
