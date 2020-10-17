@@ -11,12 +11,12 @@ class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=255, min_length=2)
     last_name = serializers.CharField(max_length=255, min_length=2)
     faculty_id = serializers.CharField(source='professor.faculty_id')
-    middile_name = serializers.CharField(source='professor.middle_name')
+    middle_name = serializers.CharField(source='professor.middle_name')
 
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'middile_name', 'faculty_id']
+                  'email', 'password', 'middle_name', 'faculty_id']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
