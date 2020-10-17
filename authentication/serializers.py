@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from users.models import Professor
+from users.models import Professor, Student
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -30,7 +30,34 @@ class UserSerializer(serializers.ModelSerializer):
         professor_data = validated_data.pop('professor')
         user = User.objects.create_user(**validated_data)
         Professor.objects.create(user=user, **professor_data)
+        return user
 
+
+class StudentUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=65, min_length=8, write_only=True)
+    email = serializers.EmailField(max_length=255, min_length=4),
+    first_name = serializers.CharField(max_length=255, min_length=2)
+    last_name = serializers.CharField(max_length=255, min_length=2)
+    middle_name = serializers.CharField(source='student.middle_name')
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name',
+                  'email', 'password', 'middle_name']
+
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError(
+                {'email': ('Email is already in use')})
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        student_data = validated_data.pop('student')
+        user = User.objects.create_user(**validated_data)
+        Student.objects.create(
+            user=user, middle_name=student_data['middle_name'], student_number=validated_data['username'])
         return user
 
 
