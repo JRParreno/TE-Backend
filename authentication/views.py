@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer, StudentUserSerializer
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -12,9 +12,11 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework.permissions import AllowAny
 
 # Register for Professor
+
+
 class RegisterView(GenericAPIView):
     serializer_class = UserSerializer
 
@@ -22,11 +24,26 @@ class RegisterView(GenericAPIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            refresh = RefreshToken.for_user(user)
-            res = {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            }
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Register for Student
+class StudentRegisterView(GenericAPIView):
+    serializer_class = StudentUserSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = (AllowAny,)
+
+        return super(StudentRegisterView, self).get_permissions()
+
+    def post(self, request):
+        serializer = StudentUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 

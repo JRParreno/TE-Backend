@@ -26,4 +26,5 @@ urlpatterns = [
          name='token_refresh'),
     path('api/auth/', include('authentication.urls')),
     path('api/chapter/', include('chapters.urls')),
+    path('api/section/', include('sections.urls')),
 ]
