@@ -9,18 +9,25 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.models import User
 import jwt
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 # Register for Professor
 class RegisterView(GenericAPIView):
     serializer_class = UserSerializer
 
-    @csrf_exempt
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            res = {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -36,12 +43,17 @@ class LoginView(GenericAPIView):
         user = auth.authenticate(username=username, password=password)
 
         if user:
-            auth_token = jwt.encode(
-                {'username': user.username}, settings.JWT_SECRET_KEY)
+            refresh = RefreshToken.for_user(user)
+            res = {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }
+            # auth_token = jwt.encode(
+            #     {'username': user.username}, settings.JWT_SECRET_KEY)
 
             serializer = UserSerializer(user)
 
-            data = {'user': serializer.data, 'token': auth_token}
+            data = {'user': serializer.data, 'token': res}
 
             return Response(data, status=status.HTTP_200_OK)
 
