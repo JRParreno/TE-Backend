@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Professor
 
 
 class ProfUpdateSerializer(serializers.ModelSerializer):
@@ -19,6 +18,6 @@ class ProfUpdateSerializer(serializers.ModelSerializer):
         middle_name_data = validated_data.pop('professor')
         user = User.objects.filter(username=instance).update(**validated_data)
 
-        Professor.objects.update(user=instance, **middle_name_data)
-        print(middle_name_data['middle_name'])
+        # Professor.objects.update(user=instance, **middle_name_data)
+        # print(middle_name_data['middle_name'])
         return instance
