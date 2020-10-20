@@ -1,28 +1,28 @@
 
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from users.models import Professor, Student
+from .models import User
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.core.exceptions import ObjectDoesNotExist
 
 
-class UserSerializer(serializers.ModelSerializer):
+class ProfUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=65, min_length=8, write_only=True)
     email = serializers.EmailField(max_length=255, min_length=4),
     first_name = serializers.CharField(max_length=255, min_length=2)
     last_name = serializers.CharField(max_length=255, min_length=2)
-    faculty_id = serializers.CharField(source='professor.faculty_id')
-    middle_name = serializers.CharField(source='professor.middle_name')
+    university_id = serializers.CharField(max_length=255, min_length=2)
+    middle_name = serializers.CharField(max_length=255, min_length=2)
 
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'middle_name', 'faculty_id']
+                  'email', 'password', 'middle_name', 'university_id']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -32,19 +32,18 @@ class UserSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        professor_data = validated_data.pop('professor')
         user = User.objects.create_user(**validated_data)
-        Professor.objects.create(user=user, **professor_data)
+        user.is_professor = True
+        user.save()
         return user
 
 
 class StudentUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=65, min_length=8, write_only=True)
-    email = serializers.EmailField(max_length=255, min_length=4),
     first_name = serializers.CharField(max_length=255, min_length=2)
     last_name = serializers.CharField(max_length=255, min_length=2)
-    middle_name = serializers.CharField(source='student.middle_name')
+    middle_name = serializers.CharField(max_length=255, min_length=2)
 
     class Meta:
         model = User
@@ -59,14 +58,22 @@ class StudentUserSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        student_data = validated_data.pop('student')
-        user = User.objects.create_user(**validated_data)
-        Student.objects.create(
-            user=user, middle_name=student_data['middle_name'], student_number=validated_data['username'])
+        student_number = validated_data.pop('username')
+        student_data = {
+            "username": student_number,
+            "password": validated_data.pop('password'),
+            "email": validated_data.pop('email'),
+            "first_name": validated_data.pop('first_name'),
+            "last_name": validated_data.pop('last_name'),
+            "middle_name": validated_data.pop('middle_name'),
+            "university_id": student_number,
+        }
+        user = User.objects.create_user(**student_data)
         return user
 
 
-class LoginSerializer(serializers.ModelSerializer):
+# prof login serializer
+class ProfLoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=65, min_length=8, write_only=True)
     username = serializers.CharField(max_length=255, min_length=2)
@@ -74,7 +81,7 @@ class LoginSerializer(serializers.ModelSerializer):
     tokens = serializers.SerializerMethodField()
 
     def get_tokens(self, obj):
-        user = User.objects.get(email=obj['username'])
+        user = User.objects.get(username=obj['username'])
 
         return {
             'refresh': user.tokens()['refresh'],
@@ -83,7 +90,66 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ['username', 'password', 'tokens']
+
+    def validate(self, attrs):
+        username = attrs.get('username', '')
+        password = attrs.get('password', '')
+        user = auth.authenticate(username=username, password=password)
+
+        if not user:
+            raise AuthenticationFailed('Invalid credentials, try again')
+
+        if not user.is_professor:
+            raise AuthenticationFailed(
+                'Invalid credentials for professor only, try again')
+
+        return {
+            'username': user.username,
+            'tokens': user.tokens
+        }
+
+        return super().validate(attrs)
+
+
+# student login serializer
+class StudentLoginSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=65, min_length=8, write_only=True)
+    username = serializers.CharField(max_length=255, min_length=2)
+
+    tokens = serializers.SerializerMethodField()
+
+    def get_tokens(self, obj):
+        user = User.objects.get(username=obj['username'])
+
+        return {
+            'refresh': user.tokens()['refresh'],
+            'access': user.tokens()['access']
+        }
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'tokens']
+
+    def validate(self, attrs):
+        username = attrs.get('username', '')
+        password = attrs.get('password', '')
+        user = auth.authenticate(username=username, password=password)
+
+        if not user:
+            raise AuthenticationFailed('Invalid credentials, try again')
+
+        if user.is_professor:
+            raise AuthenticationFailed(
+                'Invalid credentials for students only, try again')
+
+        return {
+            'username': user.username,
+            'tokens': user.tokens
+        }
+
+        return super().validate(attrs)
 
 
 class ResetPasswordEmailRequestSerializer(serializers.Serializer):
@@ -124,6 +190,19 @@ class SetNewPasswordSerializer(serializers.Serializer):
         except Exception as e:
             raise AuthenticationFailed('The reset link is invalid', 401)
         return super().validate(attrs)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_passowrd']
 
 
 class LogoutSerializer(serializers.Serializer):

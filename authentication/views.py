@@ -3,15 +3,16 @@ from django.shortcuts import render
 # Create your views here.
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import (UserSerializer, LoginSerializer,
+from .serializers import (ProfUserSerializer, ProfLoginSerializer,
                           StudentUserSerializer, ResetPasswordEmailRequestSerializer,
-                          SetNewPasswordSerializer, LogoutSerializer)
+                          SetNewPasswordSerializer, LogoutSerializer, StudentLoginSerializer,
+                          ChangePasswordSerializer)
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import status, views, permissions
+from rest_framework import status, views, permissions, generics
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.auth.models import User
+from .models import User
 import jwt
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -33,11 +34,11 @@ class CustomRedirect(HttpResponsePermanentRedirect):
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
 
 
-class RegisterView(GenericAPIView):
-    serializer_class = UserSerializer
+class ProfRegisterView(GenericAPIView):
+    serializer_class = ProfUserSerializer
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = ProfUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
 
@@ -50,11 +51,11 @@ class RegisterView(GenericAPIView):
 class StudentRegisterView(GenericAPIView):
     serializer_class = StudentUserSerializer
 
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            self.permission_classes = (AllowAny,)
+    # def get_permissions(self):
+    #     if self.request.method == 'POST':
+    #         self.permission_classes = (AllowAny,)
 
-        return super(StudentRegisterView, self).get_permissions()
+    #     return super(StudentRegisterView, self).get_permissions()
 
     def post(self, request):
         serializer = StudentUserSerializer(data=request.data)
@@ -66,32 +67,24 @@ class StudentRegisterView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginView(GenericAPIView):
-    serializer_class = LoginSerializer
+# professor login
+class ProfLoginView(GenericAPIView):
+    serializer_class = ProfLoginSerializer
 
     def post(self, request):
-        data = request.data
-        username = data.get('username', '')
-        password = data.get('password', '')
-        user = auth.authenticate(username=username, password=password)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        if user:
-            refresh = RefreshToken.for_user(user)
-            res = {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            }
-            # auth_token = jwt.encode(
-            #     {'username': user.username}, settings.JWT_SECRET_KEY)
 
-            serializer = UserSerializer(user)
+# student Login
+class StudebtLoginView(GenericAPIView):
+    serializer_class = StudentLoginSerializer
 
-            data = {'user': serializer.data, 'token': res}
-
-            return Response(data, status=status.HTTP_200_OK)
-
-            # SEND RES
-        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RequestPasswordResetEmail(GenericAPIView):
@@ -173,3 +166,38 @@ class LogoutAPIView(GenericAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ChangePasswordView(generics.UpdateAPIView):
+    """
+    An endpoint for changing password.
+    """
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
