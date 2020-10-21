@@ -1,6 +1,10 @@
-# from django.urls import path
-# from .views import ChapterAPIView
+from django.urls import path, include
+from .views import ChapterAPIView
+from rest_framework import routers
+router = routers.DefaultRouter()
+router.register('list', ChapterAPIView, basename='chapter')
 
-# urlpatterns = [
-#     path('chapters/', ChapterAPIView.as_view())
-# ]
+urlpatterns = [
+    path('viewset/', include(router.urls)),
+    path('viewset/<int:pk>/', include(router.urls)),
+]
