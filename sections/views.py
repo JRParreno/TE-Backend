@@ -17,6 +17,7 @@ class SectionAPIView(viewsets.ModelViewSet):
 
     permission_classes = (permissions.IsAuthenticated,)
     queryset = Section.objects.all()
+    serializer_class = SectionSerializer
     # def list(self, request):  # get method
     #     queryset = Section.objects.all()
     #     serializer = SectionSerializer(queryset, many=True)
