@@ -6,4 +6,4 @@ class SectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ['user', 'code', 'schedule']
+        fields = ['id', 'user', 'code', 'schedule']
