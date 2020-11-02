@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'activity',
     'question',
     'assesment',
+    'student',
     'authentication',
     'corsheaders',
 ]

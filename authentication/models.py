@@ -39,7 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
-    university_id = models.CharField(max_length=255)
+    university_id = models.CharField(max_length=255, unique=True)
     is_professor = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
