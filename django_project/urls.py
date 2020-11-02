@@ -28,5 +28,6 @@ urlpatterns = [
     path('api/auth/', include('authentication.urls')),
     path('api/section/', include('sections.urls')),
     path('api/chapter/', include('chapters.urls')),
+    path('api/student/', include('student.urls')),
     path('api/user/', include('users.urls')),
 ]
