@@ -8,6 +8,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.core.exceptions import ObjectDoesNotExist
+from sections.models import StudentSection, Section
 
 
 class ProfUserSerializer(serializers.ModelSerializer):
@@ -39,8 +40,8 @@ class ProfUserSerializer(serializers.ModelSerializer):
 
 
 class StudentUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        max_length=65, min_length=8, write_only=True)
+    # password = serializers.CharField(
+    #     max_length=65, min_length=8, write_only=True)
     first_name = serializers.CharField(max_length=255, min_length=2)
     last_name = serializers.CharField(max_length=255, min_length=2)
     middle_name = serializers.CharField(max_length=255, min_length=2)
@@ -48,7 +49,7 @@ class StudentUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'middle_name']
+                  'email', 'middle_name']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -61,7 +62,7 @@ class StudentUserSerializer(serializers.ModelSerializer):
         student_number = validated_data.pop('username')
         student_data = {
             "username": student_number,
-            "password": validated_data.pop('password'),
+            "password": student_number,
             "email": validated_data.pop('email'),
             "first_name": validated_data.pop('first_name'),
             "last_name": validated_data.pop('last_name'),
@@ -69,6 +70,9 @@ class StudentUserSerializer(serializers.ModelSerializer):
             "university_id": student_number,
         }
         user = User.objects.create_user(**student_data)
+        get_user = User.objects.get(username=user)
+        section = Section.objects.get(pk=self.context['pk'])
+        StudentSection.objects.create(section=section, student=get_user)
         return user
 
 
