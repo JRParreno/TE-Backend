@@ -13,3 +13,11 @@ class Section(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class StudentSection(models.Model):
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.student)

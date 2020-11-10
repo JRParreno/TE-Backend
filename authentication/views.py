@@ -60,7 +60,7 @@ class StudentRegisterView(GenericAPIView):
     def post(self, request):
         serializer = StudentUserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
