@@ -8,4 +8,4 @@ class SubmitAnswer(models.Model):
     answer = models.CharField(max_length=100, null=True, blank=False)
 
     def __str__(self):
-        return str(self.user.username)
+        return str(self.answer)
