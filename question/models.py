@@ -19,7 +19,7 @@ class Question(models.Model):
     number = models.IntegerField()
 
     def __str__(self):
-        return str(self.q_type)
+        return str(self.question_name)
 
     def choices(self):
         if not hasattr(self, '_choices'):
@@ -36,7 +36,13 @@ class Choices(models.Model):
     description = models.CharField(max_length=100, null=True, blank=False)
     
     def __str__(self):
-        return self.description
+        return str(self.question)
+    
+    def activity_code(self):
+        return str(self.question.activity)
+    
+    def get_chapter(self):
+        return str(self.question.activity.chapter)
 
 
 class AnswerKey(models.Model):
@@ -45,6 +51,12 @@ class AnswerKey(models.Model):
 
     def __str__(self):
         return self.answer
+
+    def activity_code(self):
+        return str(self.question.activity)
+    
+    def get_chapter(self):
+        return str(self.question.activity.chapter)
 
 
 

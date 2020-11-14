@@ -21,3 +21,6 @@ class StudentSection(models.Model):
 
     def __str__(self):
         return str(self.student)
+
+    def professor(self):
+        return self.section.user
