@@ -129,7 +129,7 @@ class StudentLoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=255, min_length=2)
 
     tokens = serializers.SerializerMethodField()
-    section = serializers.PrimaryKeyRelatedField(read_only=True)
+    section = serializers.CharField(read_only=True)
 
     def get_tokens(self, obj):
         user = User.objects.get(username=obj['username'])
@@ -148,7 +148,7 @@ class StudentLoginSerializer(serializers.ModelSerializer):
         password = attrs.get('password', '')
         user = auth.authenticate(username=username, password=password)
 
-        section = StudentSection.objects.get(student=user)
+        get_section = StudentSection.objects.get(student=user)
         
 
         if not user:
@@ -162,7 +162,7 @@ class StudentLoginSerializer(serializers.ModelSerializer):
         return {
             'username': user.username,
             'tokens': user.tokens,
-            'section': section
+            'section': get_section.section.pk
         }
 
         return super().validate(attrs)
