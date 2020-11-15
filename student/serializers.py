@@ -2,6 +2,8 @@ from rest_framework import serializers
 from authentication.models import User
 from sections.models import Section
 from assesment.models import Assesment
+from question.models import Question
+
 
 class StudentSerializer(serializers.ModelSerializer):
 
@@ -14,12 +16,10 @@ class StudentSerializer(serializers.ModelSerializer):
 class SubmitSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Assesment
-        fields = ['activity', 'student', 'score']
+        model = Question
+        fields = ['id', 'answer']
 
-    def create(self, validated_data):
-        data = validated_data
-        return data
+
 
 
 # class StudentUserSerializer(serializers.ModelSerializer):
