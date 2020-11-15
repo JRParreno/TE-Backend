@@ -148,8 +148,6 @@ class StudentLoginSerializer(serializers.ModelSerializer):
         password = attrs.get('password', '')
         user = auth.authenticate(username=username, password=password)
 
-        get_section = StudentSection.objects.get(student=user)
-        
 
         if not user:
             raise AuthenticationFailed('Invalid credentials, try again')
@@ -158,6 +156,8 @@ class StudentLoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed(
                 'Invalid credentials for students only, try again')
 
+        get_section = StudentSection.objects.get(student=user)
+        
         
         return {
             'username': user.username,
