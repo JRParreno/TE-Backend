@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Choices, AnswerKey
+from .models import Question, Choices
 
 
 @admin.register(Question)
@@ -31,20 +31,5 @@ class ChoicesAdmin(admin.ModelAdmin):
     list_filter = (
         'question',
         'description',
-        
-    )
-
-
-@admin.register(AnswerKey)
-class AnswerAdmin(admin.ModelAdmin):
-    '''Admin View for Post'''
-
-    list_display = (
-        'question',
-        'answer',
-    )
-    list_filter = (
-        'question',
-        'answer',
         
     )

@@ -8,9 +8,6 @@ from rest_framework import status
 
 User = get_user_model()
 
-# professor udpate profile
-# GET, PUT and PATCH method
-
 
 class ProfUpdateView(generics.RetrieveUpdateAPIView):
 
@@ -28,8 +25,6 @@ class ProfUpdateView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# student update profile
-# GET, PUT and PATCH method
 class StudentUpdateView(generics.RetrieveUpdateAPIView):
 
     serializer_class = StudentUpdateSerializer

@@ -9,6 +9,6 @@ app_name = 'student'
 urlpatterns = [
     path('viewset/', include(router.urls)),
     path('viewset/<int:pk>/', include(router.urls)),
-    path('submit/<activity>/', SubmitAPIView.as_view()),
+    path('submit/', SubmitAPIView.as_view()),
 ]
 
