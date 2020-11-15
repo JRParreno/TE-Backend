@@ -116,6 +116,12 @@ class ProfLoginSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
 
+class SectionLoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentSection
+        fields = ['section']
+
+
 # student login serializer
 class StudentLoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -123,6 +129,7 @@ class StudentLoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=255, min_length=2)
 
     tokens = serializers.SerializerMethodField()
+    section = serializers.PrimaryKeyRelatedField(read_only=True)
 
     def get_tokens(self, obj):
         user = User.objects.get(username=obj['username'])
@@ -134,12 +141,15 @@ class StudentLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'tokens']
+        fields = ['username', 'password', 'tokens', 'section']
 
     def validate(self, attrs):
         username = attrs.get('username', '')
         password = attrs.get('password', '')
         user = auth.authenticate(username=username, password=password)
+
+        section = StudentSection.objects.get(student=user)
+        
 
         if not user:
             raise AuthenticationFailed('Invalid credentials, try again')
@@ -148,9 +158,11 @@ class StudentLoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed(
                 'Invalid credentials for students only, try again')
 
+        
         return {
             'username': user.username,
-            'tokens': user.tokens
+            'tokens': user.tokens,
+            'section': section
         }
 
         return super().validate(attrs)
