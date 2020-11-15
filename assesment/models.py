@@ -10,4 +10,4 @@ class Assesment(models.Model):
     date_taken = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.score
+        return str(self.score)

@@ -1,19 +1,19 @@
-# from django.contrib import admin
-# from .models import Assesment
+from django.contrib import admin
+from .models import Assesment
 
 
-# @admin.register(Assesment)
-# class AssesmentAdmin(admin.ModelAdmin):
-#     '''Admin View for Post'''
+@admin.register(Assesment)
+class AssesmentAdmin(admin.ModelAdmin):
+    '''Admin View for Post'''
 
-#     list_display = (
-#         'activity',
-#         'student',
-#         'score',
-#         'date_taken',
-#     )
-#     list_filter = (
-#         'activity',
-#         'score',
-#         'date_taken',
-#     )
+    list_display = (
+        'activity',
+        'student',
+        'score',
+        'date_taken',
+    )
+    list_filter = (
+        'activity',
+        'score',
+        'date_taken',
+    )
