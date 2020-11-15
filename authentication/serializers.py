@@ -48,7 +48,7 @@ class StudentUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name',
+        fields = ['id', 'username', 'first_name', 'last_name',
                   'email', 'middle_name']
 
     def validate(self, attrs):
@@ -94,7 +94,7 @@ class ProfLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'tokens']
+        fields = ['id', 'username', 'password', 'tokens']
 
     def validate(self, attrs):
         username = attrs.get('username', '')
@@ -109,6 +109,7 @@ class ProfLoginSerializer(serializers.ModelSerializer):
                 'Invalid credentials for professor only, try again')
 
         return {
+            'id': user.id,
             'username': user.username,
             'tokens': user.tokens
         }
@@ -141,7 +142,7 @@ class StudentLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'tokens', 'section']
+        fields = ['id', 'username', 'password', 'tokens', 'section']
 
     def validate(self, attrs):
         username = attrs.get('username', '')
@@ -160,9 +161,11 @@ class StudentLoginSerializer(serializers.ModelSerializer):
         
         
         return {
+            'id': user.pk,
+            'section': get_section.section.pk,
             'username': user.username,
             'tokens': user.tokens,
-            'section': get_section.section.pk
+            
         }
 
         return super().validate(attrs)

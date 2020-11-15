@@ -17,7 +17,7 @@ class Question(models.Model):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     q_type = models.CharField(max_length=10, choices=QUESTION_TYPES)
     number = models.IntegerField()
-
+    answer = models.CharField(max_length=255, null=True, blank=False)
     def __str__(self):
         return str(self.question_name)
 
@@ -44,19 +44,6 @@ class Choices(models.Model):
     def get_chapter(self):
         return str(self.question.activity.chapter)
 
-
-class AnswerKey(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False, null=True)
-    answer = models.CharField(max_length=100, null=True, blank=False)
-
-    def __str__(self):
-        return self.answer
-
-    def activity_code(self):
-        return str(self.question.activity)
-    
-    def get_chapter(self):
-        return str(self.question.activity.chapter)
 
 
 
