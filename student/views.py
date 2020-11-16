@@ -34,7 +34,8 @@ class SubmitAPIView(GenericAPIView):
         for i in request.data:
             check = Question.objects.filter(pk=i['question'], answer=i['answer'])
             if check.exists():
-                score +=1
+                get_point = check.first()
+                score += get_point.points
         try:
             activity = Activity.objects.get(pk=self.kwargs['activity'])
         except:

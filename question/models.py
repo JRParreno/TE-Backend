@@ -18,6 +18,7 @@ class Question(models.Model):
     q_type = models.CharField(max_length=10, choices=QUESTION_TYPES)
     number = models.IntegerField()
     answer = models.CharField(max_length=255, null=True, blank=False)
+    points = models.IntegerField(null=True, blank=False)
     def __str__(self):
         return str(self.question_name)
 
