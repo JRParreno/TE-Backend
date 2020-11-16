@@ -9,6 +9,7 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = (
         'number',
         'question_name',
+        'answer',
         'q_type',
         'activity',
     )
