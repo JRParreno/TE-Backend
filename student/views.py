@@ -43,7 +43,15 @@ class SubmitAPIView(GenericAPIView):
 
         ActivityRemarks.objects.create(activity=activity, user=request.user)
         Assesment.objects.create(activity=activity, student=request.user, score=score)
-        
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        remarks = 'fail'
+        if score > 29:
+            remarks = 'pass'
+
+        data = {
+            'remarks': remarks,
+            'score': f"{score}/{activity.total_score}",
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
 
 

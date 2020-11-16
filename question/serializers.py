@@ -34,10 +34,11 @@ class ChoiceTextSerializer(serializers.ModelSerializer):
 class QuestionnaireSerializer(serializers.ModelSerializer):
     
     choices = ChoiceTextSerializer(many=True, read_only=True)
-
+    answer = serializers.CharField(read_only=True)
     class Meta:
         model = Question
-        fields = ['number', 'id', 'q_type', 'question_name', 'choices']
+        fields = ['number', 'id', 'q_type', 'question_name',
+            'choices', 'answer']
 
 
 
