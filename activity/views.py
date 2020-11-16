@@ -22,12 +22,3 @@ class ProfActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     queryset = ProfActivity.objects.all()
     serializer_class = ProfActivitySerializer
-
-    # def retrieve(self, request, pk=None):
-    #     try:
-    #         activity = ProfActivity.objects.get(activity=self.kwargs['pk'], student__is_professor=False)
-    #         serializer = ProfActivitySerializer(activity, many=True)
-
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     except:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

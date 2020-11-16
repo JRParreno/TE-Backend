@@ -14,6 +14,10 @@ class Activity(models.Model):
     
 
 class ProfActivity(models.Model):
+    
+    class Meta:
+        unique_together = [['activity', 'section']]
+    
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=True, blank=False)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=False)
     start = models.DateField(null=True, blank=False)
