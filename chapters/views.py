@@ -26,7 +26,7 @@ class ChapterFeedbackAPIView(generics.ListCreateAPIView):
     def get_queryset(self):  # filter by chapter
         return self.queryset.filter(student_chapter=self.kwargs['chapter'])
 
-    def post(self, request):
+    def post(self, request, chapter=None):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

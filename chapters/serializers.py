@@ -27,11 +27,13 @@ class StudentRemarksSerializer(serializers.ModelSerializer):
 
 class ChapterFeedbackSerializer(serializers.ModelSerializer):
 
+    date_posted = serializers.DateTimeField(format='%m-%d-%Y' ,read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+
     class Meta:
         model = ChapterFeedback
-        fields = ['user', 'student_chapter', 'feedback']
+        fields = ['user', 'username', 'student_chapter', 'feedback', 'date_posted']
 
     def create(self, validated_data):
-        print(validated_data)
 
         return ChapterFeedback.objects.create(**validated_data)
