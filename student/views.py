@@ -28,7 +28,7 @@ class SubmitAPIView(GenericAPIView):
     parser_classes = (MultiPartParser, FormParser,)
     
     def post(self, request, format=None, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, many=True)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         # answer_list = json.dumps(request.data)
         # answer_dict = json.loads(answer_list)
