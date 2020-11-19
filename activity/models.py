@@ -4,8 +4,18 @@ from sections.models import Section
 from chapters.models import Chapter
 from datetime import datetime
 
+
+# activity type
+class ActivityType(models.Model):
+    name = models.CharField(max_length=50, null=True, blank=False)
+
+    def __str__(self):
+        return str(self.name)
+
+
 # activities
 class Activity(models.Model):
+    activity_type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, null=True, blank=False)
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, null=True, blank=False)
     activity_name = models.CharField(max_length=100, null=True, blank=False)
     total_score = models.IntegerField(null=True, blank=False)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Activity, ProfActivity, ActivityRemarks
+from .models import Activity, ProfActivity, ActivityRemarks, ActivityType
 
 
 @admin.register(Activity)
@@ -30,6 +30,18 @@ class ProfActivityAdmin(admin.ModelAdmin):
         'section',
         'activity',
         'remarks',
+    )
+
+
+@admin.register(ActivityType)
+class ActivityTypeAdmin(admin.ModelAdmin):
+    '''Admin View for Post'''
+
+    list_display = (
+        'name',
+    )
+    list_filter = (
+        'name',
     )
 
 
