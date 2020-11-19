@@ -10,15 +10,19 @@ class Question(models.Model):
 
     QUESTION_TYPES = [
         ('IDENT', 'Identification'),
-        ('MULT', 'Mutliple Choice')
+        ('MULT', 'Mutliple Choice'),
+        ('TABLE', 'Fill up table'),
+        ('CODE', 'Upload file')
     ]
 
     question_name = models.CharField(max_length=255, null=True, blank=False)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     q_type = models.CharField(max_length=10, choices=QUESTION_TYPES)
     number = models.IntegerField()
-    answer = models.CharField(max_length=255, null=True, blank=False)
+    answer = models.CharField(max_length=255, null=True, blank=True)
     points = models.IntegerField(null=True, blank=False)
+    table_filename = models.CharField(max_length=255, null=True, blank=True)
+
     def __str__(self):
         return str(self.question_name)
 
