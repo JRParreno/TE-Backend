@@ -3,6 +3,7 @@ from authentication.models import User
 from sections.models import Section
 from assesment.models import Assesment
 from question.models import Question
+from .models import SubmitSummary
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -15,9 +16,13 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class SubmitSerializer(serializers.ModelSerializer):
 
+    code_file = serializers.FileField(required=False)
+    table_image = serializers.ImageField(required=False)
+
     class Meta:
-        model = Question
-        fields = ['id', 'answer']
+        model = SubmitSummary
+        fields = ['id', 'question', 'student', 'answer', 'table_image', 'code_file']
+
 
 
 
