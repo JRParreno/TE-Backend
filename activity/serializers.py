@@ -17,9 +17,11 @@ class ProfActivitySerializer(serializers.ModelSerializer):
     activity_name = serializers.CharField(source='activity.activity_name', read_only=True)
     section_code = serializers.CharField(source='section.code', read_only=True)
     activity_type = serializers.CharField(source='activity.activity_type', read_only=True)
+    chapter = serializers.IntegerField(source='activity.chapter.pk', read_only=True)
+    
     class Meta:
         model = ProfActivity
-        fields = ['id', 'activity', 'activity_name', 'activity_type','section', 'section_code', 'start', 'end', 'remarks']
+        fields = ['id', 'chapter','activity', 'activity_name', 'activity_type','section', 'section_code', 'start', 'end', 'remarks']
 
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
