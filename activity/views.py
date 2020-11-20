@@ -6,6 +6,7 @@ from rest_framework import status, views, permissions, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import viewsets
+from sections.models import StudentSection
 from rest_framework.views import APIView
 
 # activity viewset
@@ -26,7 +27,21 @@ class ProfActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ProfActivitySerializer
 
     def get_queryset(self):
-        return self.queryset.filter(activity__activity_type=self.kwargs['activity_type'], section__user=self.request.user)
+        queryset = self.queryset.filter(activity__activity_type=self.kwargs['activity_type'], section__user=self.request.user)
+        return queryset
+
+
+# activity viewset for professor
+class StudentActivityAPIView(generics.ListAPIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = ProfActivity.objects.all()
+    serializer_class = ProfActivitySerializer
+
+    def get_queryset(self):
+        section = StudentSection.objects.get(student=self.request.user)
+        queryset = self.queryset.filter(activity__activity_type=self.kwargs['activity_type'], section=section.section)
+        return queryset
 
 
 # activity type

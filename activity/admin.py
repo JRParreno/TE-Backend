@@ -21,6 +21,7 @@ class ProfActivityAdmin(admin.ModelAdmin):
     '''Admin View for Post'''
 
     list_display = (
+        'pk',
         'section',
         'activity',
         'start',
@@ -39,6 +40,7 @@ class ActivityTypeAdmin(admin.ModelAdmin):
     '''Admin View for Post'''
 
     list_display = (
+        'pk',
         'name',
     )
     list_filter = (
