@@ -11,3 +11,8 @@ class Assesment(models.Model):
 
     def __str__(self):
         return str(self.score)
+
+    @property
+    def full_name(self):
+        name = '{} {} {}'.format(self.student.last_name, self.student.first_name, self.student.middle_name)
+        return name
