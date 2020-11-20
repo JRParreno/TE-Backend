@@ -8,10 +8,12 @@ class ActivityAdmin(admin.ModelAdmin):
 
     list_display = (
         'pk',
+        'activity_type',
         'activity_name',
         'chapter',
     )
     list_filter = (
+        'activity_type',
         'activity_name',
         'chapter',
     )

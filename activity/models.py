@@ -19,6 +19,7 @@ class Activity(models.Model):
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, null=True, blank=False)
     activity_name = models.CharField(max_length=100, null=True, blank=False)
     total_score = models.IntegerField(null=True, blank=False)
+    # activity description
     def __str__(self):
         return str(self.activity_name)
     
@@ -33,7 +34,7 @@ class ProfActivity(models.Model):
     start = models.DateField(null=True, blank=False)
     end = models.DateField(null=True, blank=False)
     remarks = models.BooleanField(default=False)
-
+    # set start and end base in chapter and acitvity type
     def __str__(self):
         return str(self.section)
 
