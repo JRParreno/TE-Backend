@@ -5,7 +5,6 @@ from assesment.models import Assesment
 from question.models import Question
 from .models import SubmitSummary
 
-
 class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -14,16 +13,34 @@ class StudentSerializer(serializers.ModelSerializer):
                   'middle_name', 'last_name', 'is_professor', 'email']
 
 
+class AssesmentScoreSerializer(serializers.ModelSerializer):
+        
+    class Meta:
+        model = Assesment
+        fields = ['score']
+
+
 class SubmitSerializer(serializers.ModelSerializer):
 
     code_file = serializers.FileField(required=False)
     table_image = serializers.ImageField(required=False)
-
+    
     class Meta:
         model = SubmitSummary
         fields = ['id', 'question', 'student', 'answer', 'table_image', 'code_file']
 
 
+class SubmitSummarySerializer(serializers.ModelSerializer):
+
+    code_file = serializers.FileField(required=False)
+    table_image = serializers.ImageField(required=False)
+    assesment = AssesmentScoreSerializer(source='question.activity', write_only=True)
+    qestion_name = serializers.CharField(source='question.question_name', read_only=True)
+    q_type = serializers.CharField(source='question.q_type')
+
+    class Meta:
+        model = SubmitSummary
+        fields = ['id', 'question', 'q_type','qestion_name', 'student', 'answer', 'table_image', 'code_file', 'assesment']
 
 
 
