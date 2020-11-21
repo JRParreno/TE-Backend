@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializers import StudentSerializer, SubmitSerializer
+from .serializers import StudentSerializer, SubmitSerializer, SubmitSummarySerializer
 from authentication.models import User
 from sections.models import Section
 from rest_framework import status, views, permissions, generics
@@ -25,6 +25,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
 
 class SubmitAPIView(GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = SubmitSerializer
     parser_classes = (MultiPartParser, FormParser,)
     
@@ -61,15 +62,58 @@ class SubmitAPIView(GenericAPIView):
                 else:
                     assesment.update(score=F('score')+1)
             
-        submitted = SubmitSummary.objects.filter(student=request.user, question__activity=activity).count()
-        total_question = Question.objects.filter(activity=activity).count()
-
-        
-        if submitted is total_question:
-            ActivityRemarks.objects.create(activity=activity, user=request.user)
+        check_remarks(request, activity)
         
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class AssesmentUpdateAPIView(GenericAPIView):
+
+    permission_classes=(permissions.IsAuthenticated,)
+    serializer_class = SubmitSummarySerializer
+    
+    def get(self, request, *args, **kwargs):
+        activity = self.kwargs['activity']
+        queryset = SubmitSummary.objects.filter(student=request.user, question__activity=activity)
+        serializer = SubmitSummarySerializer(queryset, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            activity = Activity.objects.get(pk=self.kwargs['activity'])
+        except:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = SubmitSummarySerializer(data=request.data, many=True)
+        answer_list = json.dumps(request.data)
+        answer_dict = json.loads(answer_list)
+        
+        for k in answer_dict:
+            if k['q_type'] == "MULT" or k['q_type'] == "IDENT":
+                
+                check = Question.objects.filter(id=k['question'])
+                if check.exists():
+                    assesment = Assesment.objects.filter(activity=activity, student=request.user)
+
+                    if not assesment.exists():
+                        Assesment.objects.create(activity=activity, student=request.user, score=1)
+                    else:
+                        assesment.update(score=F('score')+k['assesment']['score'])
+        
+        check_remarks(request, activity)
+        
+        return Response(request.data, status=status.HTTP_200_OK)
+
+
+def check_remarks(request, activity):
+
+    submitted = SubmitSummary.objects.filter(student=request.user, question__activity=activity).count()
+    total_question = Question.objects.filter(activity=activity).count()
+
+        
+    if submitted is total_question:
+        ActivityRemarks.objects.create(activity=activity, user=request.user)

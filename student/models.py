@@ -1,6 +1,7 @@
 from django.db import models
 from authentication.models import User
 from question.models import Question
+from assesment.models import Assesment
 
 
 class SubmitSummary(models.Model):
@@ -13,3 +14,14 @@ class SubmitSummary(models.Model):
 
     def __str__(self):
         return str(self.student)
+
+    @property
+    def get_score(self):
+        
+        score = 0
+        check_student = Assesment.objects.filter(activity=self.question.activity, student=self.student).values('score')
+        
+        if check_student.exists():
+            get_student_score = check_student.first()
+            score = get_student_score['score']
+        return score
