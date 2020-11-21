@@ -59,3 +59,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+    
+    def assesment(self):
+        if not hasattr(self, '_assesment'):
+            self._assesment = self.assesment_set.all()
+        return self._assesment
+    
+    @property
+    def full_name(self):
+        name = '{} {} {}'.format(self.last_name, self.first_name, self.middle_name)
+        return name
