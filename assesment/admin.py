@@ -13,7 +13,6 @@ class AssesmentAdmin(admin.ModelAdmin):
         'date_taken',
     )
     list_filter = (
-        'activity',
         'score',
         'date_taken',
     )

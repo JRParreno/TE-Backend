@@ -1,15 +1,21 @@
 from rest_framework import serializers
 from authentication.models import User
-from sections.models import StudentSection
+from .models import Assesment
+from student.models import SubmitSummary
 
 
 class AssesmentSerializer(serializers.ModelSerializer):
-    
-    # student_number = serializers.CharField(source='student.university_id',read_only=True)
-    # full_name =serializers.ReadOnlyField()
+        
+    class Meta:
+        model = Assesment
+        fields = ['activity', 'score', 'date_taken']
+
+
+class AssesmentUserSerializer(serializers.ModelSerializer):
+    full_name =serializers.ReadOnlyField()
+    assesment = AssesmentSerializer(many=True, read_only=True)
     
     class Meta:
-        model = StudentSection
-        fields = ['section', 'student']
-
+        model = User
+        fields = ['university_id' ,'full_name', 'assesment']
     
