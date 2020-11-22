@@ -1,6 +1,7 @@
 from django.db import models
-from activity.models import Activity
+from activity.models import Activity, ProfActivity
 from authentication.models import User
+from django.shortcuts import get_object_or_404
 
 
 class Question(models.Model):
@@ -30,7 +31,10 @@ class Question(models.Model):
         if not hasattr(self, '_choices'):
             self._choices = self.choices_set.all()
         return self._choices
-
+    
+    def activity_description(self):
+        profactivity = get_object_or_404(Activity, pk=self.activity.pk)
+        return profactivity.description
 
 class Choices(models.Model):
 

@@ -3,6 +3,7 @@ from authentication.models import User
 from sections.models import Section
 from chapters.models import Chapter
 from datetime import datetime
+from django.shortcuts import get_object_or_404
 
 
 # activity type
@@ -19,7 +20,8 @@ class Activity(models.Model):
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, null=True, blank=False)
     activity_name = models.CharField(max_length=100, null=True, blank=False)
     total_score = models.IntegerField(null=True, blank=False)
-    # activity description
+    description = models.CharField(max_length=255, null=True, blank=False)
+    
     def __str__(self):
         return str(self.activity_name)
     
@@ -38,6 +40,10 @@ class ProfActivity(models.Model):
     def __str__(self):
         return str(self.section)
 
+    @property
+    def activity_description(self):
+        profactivity = get_object_or_404(Activity, pk=self.activity.pk)
+        return profactivity.description
 
 class ActivityRemarks(models.Model):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=True, blank=False)
