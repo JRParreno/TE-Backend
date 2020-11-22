@@ -100,12 +100,12 @@ class SubmitAPIView(GenericAPIView):
 class AssesmentUpdateAPIView(GenericAPIView):
 
     permission_classes=(permissions.IsAuthenticated,)
-    serializer_class = SubmitSummarySerializer
+    serializer_class = SubmitUpdateSerializer
     
     def get(self, request, *args, **kwargs):
         activity = self.kwargs['activity']
         queryset = SubmitSummary.objects.filter(student=request.user, question__activity=activity)
-        serializer = SubmitSummarySerializer(queryset, many=True)
+        serializer = SubmitSerializer(queryset, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -116,7 +116,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
         except:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = SubmitSummarySerializer(data=request.data, many=True)
+        serializer = SubmitUpdateSerializer(data=request.data, many=True)
         answer_list = json.dumps(request.data)
         answer_dict = json.loads(answer_list)
         
@@ -128,7 +128,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
                     assesment = Assesment.objects.filter(activity=activity, student=request.user)
 
                     if not assesment.exists():
-                        Assesment.objects.create(activity=activity, student=request.user, score=1)
+                        Assesment.objects.create(activity=activity, student=request.user, score=k['assesment']['score'])
                     else:
                         assesment.update(score=F('score')+k['assesment']['score'])
         
