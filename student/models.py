@@ -7,6 +7,7 @@ from assesment.models import Assesment
 class SubmitSummary(models.Model):
     
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=False)
+    assesment = models.ForeignKey(Assesment, on_delete=models.CASCADE, null=True, blank=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
     answer = models.CharField(max_length=255, null=True, blank=True)
     table_image = models.ImageField(upload_to='table_images', null=True, blank=True)
@@ -14,6 +15,7 @@ class SubmitSummary(models.Model):
 
     def __str__(self):
         return str(self.student)
+
 
     @property
     def get_score(self):
