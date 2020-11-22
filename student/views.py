@@ -56,9 +56,10 @@ class SubmitAPIView(GenericAPIView):
             
             check = Question.objects.filter(id=answer_dict['question'], answer=answer_dict['answer'])
             assesment = None
+            assesment = Assesment.objects.filter(activity=activity, student=request.user)
+            summary = serializer.save()
             if check.exists():
-                assesment = Assesment.objects.filter(activity=activity, student=request.user)
-                summary = serializer.save()
+                
                 if not assesment.exists():
                     created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
                     summary.assesment = created_assesment
@@ -68,6 +69,16 @@ class SubmitAPIView(GenericAPIView):
                     get_assesment = Assesment.objects.get(pk=assesment.first().pk)
                     summary.assesment = get_assesment
                     summary.save()
+            else:
+                if not assesment.exists():
+                    created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=0)
+                    summary.assesment = created_assesment
+                    summary.save()
+                else:
+                    get_assesment = Assesment.objects.get(pk=assesment.first().pk)
+                    summary.assesment = get_assesment
+                    summary.save()
+
         else:
             assesment = Assesment.objects.filter(activity=activity, student=request.user)
             summary = serializer.save()
@@ -76,7 +87,6 @@ class SubmitAPIView(GenericAPIView):
                 summary.assesment = created_assesment
                 summary.save()
             else:
-                assesment.update(score=F('score')+1)
                 get_assesment = Assesment.objects.get(pk=assesment.first().pk)
                 summary.assesment = get_assesment
                 summary.save()
@@ -111,7 +121,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
         answer_dict = json.loads(answer_list)
         
         for k in answer_dict:
-            if k['q_type'] == "MULT" or k['q_type'] == "IDENT":
+            if k['q_type'] != "MULT" or k['q_type'] != "IDENT":
                 
                 check = Question.objects.filter(id=k['question'])
                 if check.exists():
