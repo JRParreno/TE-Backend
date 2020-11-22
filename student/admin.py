@@ -8,6 +8,7 @@ class SubmitSummaryAdmin(admin.ModelAdmin):
 
     list_display = (
         'student',
+        'assesment',
         'question',
         'answer',
         'table_image',

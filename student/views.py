@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializers import StudentSerializer, SubmitSerializer, SubmitSummarySerializer
+from .serializers import StudentSerializer, SubmitSerializer, SubmitSummarySerializer, SubmitUpdateSerializer
 from authentication.models import User
 from sections.models import Section
 from rest_framework import status, views, permissions, generics
@@ -10,6 +10,7 @@ from activity.models import ActivityRemarks, Activity
 from question.models import Question
 from assesment.models import Assesment
 from activity.models import ActivityRemarks
+from sections.models import Section, StudentSection
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.generics import GenericAPIView
 from django.db.models import Q, F
@@ -54,18 +55,35 @@ class SubmitAPIView(GenericAPIView):
 
             
             check = Question.objects.filter(id=answer_dict['question'], answer=answer_dict['answer'])
+            assesment = None
             if check.exists():
                 assesment = Assesment.objects.filter(activity=activity, student=request.user)
-
+                summary = serializer.save()
                 if not assesment.exists():
-                    Assesment.objects.create(activity=activity, student=request.user, score=1)
+                    created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
+                    summary.assesment = created_assesment
+                    summary.save()
                 else:
                     assesment.update(score=F('score')+1)
+                    get_assesment = Assesment.objects.get(pk=assesment.first().pk)
+                    summary.assesment = get_assesment
+                    summary.save()
+        else:
+            assesment = Assesment.objects.filter(activity=activity, student=request.user)
+            summary = serializer.save()
+            if not assesment.exists():
+                created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
+                summary.assesment = created_assesment
+                summary.save()
+            else:
+                assesment.update(score=F('score')+1)
+                get_assesment = Assesment.objects.get(pk=assesment.first().pk)
+                summary.assesment = get_assesment
+                summary.save()
             
         check_remarks(request, activity)
         
-        serializer.save()
-
+        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -117,3 +135,14 @@ def check_remarks(request, activity):
         
     if submitted is total_question:
         ActivityRemarks.objects.create(activity=activity, user=request.user)
+
+
+class StudentSubmitListAPIView(generics.ListAPIView):
+    permission_classes=(permissions.IsAuthenticated,)
+    serializer_class = SubmitSummarySerializer
+
+    def get_queryset(self):
+        get_student_section = StudentSection.objects.filter(section=self.kwargs['section']).values('student')
+
+        students = Assesment.objects.filter(student__in=get_student_section, activity=self.kwargs['activity'])
+        return students
