@@ -39,8 +39,12 @@ class StudentActivityAPIView(generics.ListAPIView):
     serializer_class = ProfActivitySerializer
 
     def get_queryset(self):
-        section = StudentSection.objects.get(student=self.request.user)
-        queryset = self.queryset.filter(activity__activity_type=self.kwargs['activity_type'], section=section.section)
+        queryset = None
+
+        if not self.request.user.is_professor:
+            section = StudentSection.objects.get(student=self.request.user)
+            queryset = self.queryset.filter(activity__activity_type=self.kwargs['activity_type'], section=section.section)
+
         return queryset
 
 
