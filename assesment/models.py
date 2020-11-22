@@ -1,7 +1,7 @@
 from django.db import models
 from authentication.models import User
 from activity.models import Activity
-
+from django.db.models import Q, F
 
 class Assesment(models.Model):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=True, blank=False)
@@ -17,4 +17,7 @@ class Assesment(models.Model):
         name = '{} {} {}'.format(self.student.last_name, self.student.first_name, self.student.middle_name)
         return name
     
-    
+    def submitsummary(self):
+        if not hasattr(self, '_submitsummary'):
+            self._submitsummary = self.submitsummary_set.exclude(Q(question__q_type="IDENT") | Q(question__q_type="MULTI"))
+        return self._submitsummary
