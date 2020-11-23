@@ -48,6 +48,9 @@ MarkupSafe = "==1.1.1"
 Pillow = "==8.0.0"
 PyJWT = "==1.7.1"
 django-jazzmin = "*"
+pip = "*"
+install = "*"
+django-smuggler = "*"
 
 [requires]
 python_version = "3.8"
