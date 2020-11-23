@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .serializers import StudentSerializer, SubmitSerializer, SubmitSummarySerializer, SubmitUpdateSerializer
 from authentication.models import User
 from sections.models import Section
@@ -9,7 +9,8 @@ from rest_framework import viewsets
 from activity.models import ActivityRemarks, Activity
 from question.models import Question
 from assesment.models import Assesment
-from activity.models import ActivityRemarks
+from activity.models import ActivityRemarks, ActivityType
+from sections.models import Section, StudentSection
 from sections.models import Section, StudentSection
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.generics import GenericAPIView
@@ -104,7 +105,8 @@ class AssesmentUpdateAPIView(GenericAPIView):
     
     def get(self, request, *args, **kwargs):
         activity = self.kwargs['activity']
-        queryset = SubmitSummary.objects.filter(student=request.user, question__activity=activity)
+        student = get_object_or_404(User, pk=self.kwargs['student_id'])
+        queryset = SubmitSummary.objects.filter(student=student, question__activity=activity).order_by('student')
         serializer = SubmitSerializer(queryset, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -122,13 +124,13 @@ class AssesmentUpdateAPIView(GenericAPIView):
         
         for k in answer_dict:
             if k['q_type'] != "MULT" or k['q_type'] != "IDENT":
-                
+                get_student = get_object_or_404(User, pk=self.kwargs['student_id'])
                 check = Question.objects.filter(id=k['question'])
                 if check.exists():
-                    assesment = Assesment.objects.filter(activity=activity, student=request.user)
+                    assesment = Assesment.objects.filter(activity=activity, student=get_student)
 
                     if not assesment.exists():
-                        Assesment.objects.create(activity=activity, student=request.user, score=k['assesment']['score'])
+                        Assesment.objects.create(activity=activity, student=get_student, score=k['assesment']['score'])
                     else:
                         assesment.update(score=F('score')+k['assesment']['score'])
         
@@ -153,6 +155,6 @@ class StudentSubmitListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         get_student_section = StudentSection.objects.filter(section=self.kwargs['section']).values('student')
-
-        students = Assesment.objects.filter(student__in=get_student_section, activity=self.kwargs['activity'])
+        activity_type = get_object_or_404(ActivityType, name="Laboratory")
+        students = Assesment.objects.filter(student__in=get_student_section, activity=self.kwargs['activity'], activity__activity_type=activity_type)
         return students

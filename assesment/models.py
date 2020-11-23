@@ -19,5 +19,5 @@ class Assesment(models.Model):
     
     def submitsummary(self):
         if not hasattr(self, '_submitsummary'):
-            self._submitsummary = self.submitsummary_set.exclude(Q(question__q_type="IDENT") | Q(question__q_type="MULTI"))
+            self._submitsummary = self.submitsummary_set.filter(Q(question__q_type="CODE") | Q(question__q_type="TABLE"))
         return self._submitsummary

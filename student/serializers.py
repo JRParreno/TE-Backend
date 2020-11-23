@@ -37,7 +37,7 @@ class SubmitUpdateSerializer(serializers.ModelSerializer):
     assesment = AssesmentScoreSerializer(source='question.activity', write_only=True)
     qestion_name = serializers.CharField(source='question.question_name', read_only=True)
     q_type = serializers.CharField(source='question.q_type')
-
+    student = serializers.CharField(read_only=True)
     class Meta:
         model = SubmitSummary
         fields = ['id', 'question', 'q_type','qestion_name', 'student', 'answer', 'table_image', 'code_file', 'assesment']
