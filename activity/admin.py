@@ -18,6 +18,8 @@ class ActivityAdmin(admin.ModelAdmin):
         'chapter',
     )
 
+    change_list_template = 'smuggler/change_list.html'
+
 @admin.register(ProfActivity)
 class ProfActivityAdmin(admin.ModelAdmin):
     '''Admin View for Post'''
@@ -36,6 +38,8 @@ class ProfActivityAdmin(admin.ModelAdmin):
         'remarks',
     )
 
+    change_list_template = 'smuggler/change_list.html'
+
 
 @admin.register(ActivityType)
 class ActivityTypeAdmin(admin.ModelAdmin):
@@ -48,6 +52,8 @@ class ActivityTypeAdmin(admin.ModelAdmin):
     list_filter = (
         'name',
     )
+
+    change_list_template = 'smuggler/change_list.html'
 
 
 @admin.register(ActivityRemarks)
@@ -64,3 +70,4 @@ class ActivityRemarksAdmin(admin.ModelAdmin):
         'user',
         'remarks',
     )
+    change_list_template = 'smuggler/change_list.html'

@@ -31,3 +31,5 @@ class UserAdmin(admin.ModelAdmin):
         'university_id',
         'is_professor',
     )
+
+    change_list_template = 'smuggler/change_list.html'

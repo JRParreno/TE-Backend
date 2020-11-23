@@ -14,7 +14,8 @@ class SectionAdmin(admin.ModelAdmin):
         'code',
         'user',
     )
-
+    change_list_template = 'smuggler/change_list.html'
+    
 
 @admin.register(StudentSection)
 class SectionStudentAdmin(admin.ModelAdmin):
@@ -29,3 +30,4 @@ class SectionStudentAdmin(admin.ModelAdmin):
         'student',
         'section',
     )
+    change_list_template = 'smuggler/change_list.html'

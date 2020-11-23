@@ -18,3 +18,4 @@ class SubmitSummaryAdmin(admin.ModelAdmin):
         'student',
         'question',
     )
+    change_list_template = 'smuggler/change_list.html'
