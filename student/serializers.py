@@ -51,3 +51,13 @@ class SubmitSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Assesment
         fields = ['full_name', 'student_number', 'submitsummary']
+
+
+class StudentSectionSerializer(serializers.ModelSerializer):
+
+    full_name = serializers.ReadOnlyField(source='student.full_name', read_only=True)
+    student_number = serializers.CharField(source='student.university_id', read_only=True)
+    student_id = serializers.CharField(source='student.pk', read_only=True)
+    class Meta:
+        model = SubmitSummary
+        fields = ['student_id', 'full_name', 'student_number']

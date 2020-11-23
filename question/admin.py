@@ -7,6 +7,7 @@ class QuestionAdmin(admin.ModelAdmin):
     '''Admin View for Post'''
 
     list_display = (
+        'pk',
         'number',
         'question_name',
         'answer',

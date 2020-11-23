@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .serializers import StudentSerializer, SubmitSerializer, SubmitSummarySerializer, SubmitUpdateSerializer
+from .serializers import StudentSerializer, StudentSectionSerializer, SubmitSerializer, SubmitSummarySerializer, SubmitUpdateSerializer
 from authentication.models import User
 from sections.models import Section
 from rest_framework import status, views, permissions, generics
@@ -86,12 +86,11 @@ class SubmitAPIView(GenericAPIView):
             if not assesment.exists():
                 created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
                 summary.assesment = created_assesment
-                summary.save()
+                
             else:
                 get_assesment = Assesment.objects.get(pk=assesment.first().pk)
                 summary.assesment = get_assesment
-                summary.save()
-            
+            summary.save()
         check_remarks(request, activity)
         
         
@@ -157,4 +156,14 @@ class StudentSubmitListAPIView(generics.ListAPIView):
         get_student_section = StudentSection.objects.filter(section=self.kwargs['section']).values('student')
         activity_type = get_object_or_404(ActivityType, name="Laboratory")
         students = Assesment.objects.filter(student__in=get_student_section, activity=self.kwargs['activity'], activity__activity_type=activity_type)
+        return students
+
+
+class StudentSectionListAPIView(generics.ListAPIView):
+    permission_classes=(permissions.IsAuthenticated,)
+    serializer_class = StudentSectionSerializer
+
+    def get_queryset(self):
+        get_student_section = StudentSection.objects.filter(section=self.kwargs['section']).values('student')
+        students = SubmitSummary.objects.filter(Q(question__q_type="CODE") | Q(question__q_type="TABLE"),student__in=get_student_section).distinct('student')
         return students
