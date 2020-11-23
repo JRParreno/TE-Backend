@@ -33,6 +33,7 @@ AUTH_USER_MODEL = 'authentication.User'
 
 INSTALLED_APPS = [
     'jazzmin',
+    'smuggler',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

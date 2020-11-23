@@ -14,6 +14,7 @@ class ChapterAdmin(admin.ModelAdmin):
     list_filter = (
         'filename',
     )
+    change_list_template = 'smuggler/change_list.html'
 
 
 @admin.register(ChapterFeedback)
@@ -31,6 +32,7 @@ class ChapteFeedbackAdmin(admin.ModelAdmin):
         'user',
         'date_posted',
     )
+    change_list_template = 'smuggler/change_list.html'
 
 
 @admin.register(StudentRemarks)
@@ -45,3 +47,4 @@ class StudentRemarksAdmin(admin.ModelAdmin):
     list_filter = (
         'chapter',
     )
+    change_list_template = 'smuggler/change_list.html'

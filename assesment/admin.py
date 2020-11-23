@@ -16,3 +16,5 @@ class AssesmentAdmin(admin.ModelAdmin):
         'score',
         'date_taken',
     )
+
+    change_list_template = 'smuggler/change_list.html'

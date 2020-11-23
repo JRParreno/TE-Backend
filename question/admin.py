@@ -17,6 +17,7 @@ class QuestionAdmin(admin.ModelAdmin):
         'activity',
         'q_type',
     )
+    change_list_template = 'smuggler/change_list.html'
 
 
 @admin.register(Choices)
@@ -34,3 +35,4 @@ class ChoicesAdmin(admin.ModelAdmin):
         'description',
         
     )
+    change_list_template = 'smuggler/change_list.html'
