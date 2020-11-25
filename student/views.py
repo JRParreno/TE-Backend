@@ -46,7 +46,7 @@ class SubmitAPIView(GenericAPIView):
             answer_list = json.dumps(request.data)
             answer_dict = json.loads(answer_list)
 
-            check_assesment = SubmitSummary.objects.filter(student=request.user, question=answer_dict['question'])
+            check_assesment = SubmitSummary.objects.filter(student=request.user, question=answer_dict['question'], remarks=True)
             
             if check_assesment.exists():
                 data = {
@@ -83,6 +83,7 @@ class SubmitAPIView(GenericAPIView):
         else:
             assesment = Assesment.objects.filter(activity=activity, student=request.user)
             summary = serializer.save()
+            summary.remarks = False
             if not assesment.exists():
                 created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
                 summary.assesment = created_assesment
@@ -105,7 +106,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
     def get(self, request, *args, **kwargs):
         activity = self.kwargs['activity']
         student = get_object_or_404(User, pk=self.kwargs['student_id'])
-        queryset = SubmitSummary.objects.filter(student=student, question__activity=activity).order_by('student')
+        queryset = SubmitSummary.objects.filter(student=student, question__activity=activity, remarks=False).order_by('student')
         serializer = SubmitSerializer(queryset, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -132,7 +133,8 @@ class AssesmentUpdateAPIView(GenericAPIView):
                         Assesment.objects.create(activity=activity, student=get_student, score=k['assesment']['score'])
                     else:
                         assesment.update(score=F('score')+k['assesment']['score'])
-        
+                    update_remarks = SubmitSummary.objects.filter(assesment__in=assesment, question__in=check, student=self.kwargs['student_id'])
+                    update_remarks.update(remarks=True)
         check_remarks(request, activity)
         
         return Response(request.data, status=status.HTTP_200_OK)
@@ -140,7 +142,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
 
 def check_remarks(request, activity):
 
-    submitted = SubmitSummary.objects.filter(student=request.user, question__activity=activity).count()
+    submitted = SubmitSummary.objects.filter(student=request.user, question__activity=activity, remarks=False).count()
     total_question = Question.objects.filter(activity=activity).count()
 
         
