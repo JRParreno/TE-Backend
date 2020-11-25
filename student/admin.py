@@ -13,6 +13,7 @@ class SubmitSummaryAdmin(admin.ModelAdmin):
         'answer',
         'table_image',
         'code_file',
+        'remarks'
     )
     list_filter = (
         'student',
