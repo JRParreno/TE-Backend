@@ -21,6 +21,7 @@ class AssesmentAPIView(generics.ListAPIView):
             
         return students
 
+
 class AssesmentFilterAPIView(generics.ListAPIView):
 
     permission_classes = (permissions.IsAuthenticated,)
@@ -32,4 +33,16 @@ class AssesmentFilterAPIView(generics.ListAPIView):
         if self.request.user.is_professor:
             student_section = StudentSection.objects.filter(section=section).values('student')
             students = User.objects.filter(id__in=student_section)
+        return students
+
+
+class AssesmentActivityStudentAPIView(generics.ListAPIView):
+    
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = AssesmentUserSerializer
+
+    def get_queryset(self):
+        
+        students = User.objects.filter(username=self.request.user)
+            
         return students
