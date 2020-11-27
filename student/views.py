@@ -106,7 +106,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
     def get(self, request, *args, **kwargs):
         activity = self.kwargs['activity']
         student = get_object_or_404(User, pk=self.kwargs['student_id'])
-        queryset = SubmitSummary.objects.filter(student=student, question__activity=activity, remarks=False).order_by('student')
+        queryset = SubmitSummary.objects.filter(student=student, question__activity=activity).order_by('student')
         serializer = SubmitSerializer(queryset, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
