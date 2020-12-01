@@ -38,9 +38,11 @@ class SubmitUpdateSerializer(serializers.ModelSerializer):
     qestion_name = serializers.CharField(source='question.question_name', read_only=True)
     q_type = serializers.CharField(source='question.q_type')
     student = serializers.CharField(read_only=True)
+    points = serializers.IntegerField(read_only=True)
     class Meta:
         model = SubmitSummary
-        fields = ['id', 'question', 'q_type','qestion_name', 'student', 'answer', 'table_image', 'code_file', 'assesment']
+        fields = ['id', 'question', 'q_type','qestion_name', 
+            'student', 'answer', 'table_image', 'code_file', 'assesment', 'points']
 
   
 class SubmitSummarySerializer(serializers.ModelSerializer):

@@ -60,32 +60,37 @@ class SubmitAPIView(GenericAPIView):
             assesment = Assesment.objects.filter(activity=activity, student=request.user)
             summary = serializer.save()
             if check.exists():
-                
+                points = check.first()
                 if not assesment.exists():
-                    created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
+                    created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=points.points)
                     summary.assesment = created_assesment
+                    summary.points = points.points
                     summary.save()
                 else:
-                    assesment.update(score=F('score')+1)
+                    assesment.update(score=F('score')+points.points)
                     get_assesment = Assesment.objects.get(pk=assesment.first().pk)
                     summary.assesment = get_assesment
+                    summary.points = points.points
                     summary.save()
             else:
                 if not assesment.exists():
                     created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=0)
                     summary.assesment = created_assesment
+                    summary.points = 0
                     summary.save()
                 else:
                     get_assesment = Assesment.objects.get(pk=assesment.first().pk)
                     summary.assesment = get_assesment
+                    summary.points = 0
                     summary.save()
 
         else:
             assesment = Assesment.objects.filter(activity=activity, student=request.user)
             summary = serializer.save()
             summary.remarks = False
+            summary.points = 0
             if not assesment.exists():
-                created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=1)
+                created_assesment = Assesment.objects.create(activity=activity, student=request.user, score=0)
                 summary.assesment = created_assesment
                 
             else:
@@ -134,7 +139,7 @@ class AssesmentUpdateAPIView(GenericAPIView):
                     else:
                         assesment.update(score=F('score')+k['assesment']['score'])
                     update_remarks = SubmitSummary.objects.filter(assesment__in=assesment, question__in=check, student=self.kwargs['student_id'])
-                    update_remarks.update(remarks=True)
+                    update_remarks.update(remarks=True, points=k['assesment']['score'])
         check_remarks(request, activity)
         
         return Response(request.data, status=status.HTTP_200_OK)
