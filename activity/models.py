@@ -21,7 +21,11 @@ class Activity(models.Model):
     activity_name = models.CharField(max_length=100, null=True, blank=False)
     total_score = models.IntegerField(null=True, blank=False)
     description = models.CharField(max_length=255, null=True, blank=False)
-    
+    activity_number = models.IntegerField(null=True, blank=False)
+
+    class Meta:
+        ordering = ['activity_number']
+
     def __str__(self):
         return str(self.activity_name)
     

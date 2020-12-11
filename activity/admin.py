@@ -7,6 +7,7 @@ class ActivityAdmin(admin.ModelAdmin):
     '''Admin View for Post'''
 
     list_display = (
+        'activity_number',
         'pk',
         'activity_type',
         'activity_name',
