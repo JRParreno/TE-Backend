@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 class ActivityViewSet(viewsets.ModelViewSet):
 
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = Activity.objects.all()
+    queryset = Activity.objects.all().order_by('activity_number')
     serializer_class = ActivitySerializer
 
     def get_queryset(self):
@@ -23,7 +23,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 class ProfActivityViewSet(viewsets.ModelViewSet):
 
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = ProfActivity.objects.all()
+    queryset = ProfActivity.objects.all().order_by('activity__activity_number')
     serializer_class = ProfActivitySerializer
 
     def get_queryset(self):
@@ -35,7 +35,7 @@ class ProfActivityViewSet(viewsets.ModelViewSet):
 class StudentActivityAPIView(generics.ListAPIView):
 
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = ProfActivity.objects.all()
+    queryset = ProfActivity.objects.all().order_by('activity__activity_number')
     serializer_class = ProfActivitySerializer
 
     def get_queryset(self):
